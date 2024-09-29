@@ -3,7 +3,7 @@ import createHttpError from 'http-errors';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseContactsFilterParams } from '../utils/filters/parseContactsFilterParams.js';
 import parseSortParams from '../utils/parseSortParams.js';
-import { sortFields } from '../db/Models/Contacts.js';
+import { sortFields } from '../db/models/Contact.js';
 
 export const getAllContactsController = async (req, res) => {
   const { perPage, page } = parsePaginationParams(req.query);
