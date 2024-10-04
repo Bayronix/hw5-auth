@@ -33,9 +33,10 @@ export const getContactById = async (contactId, userId) => {
     _id: contactId,
     userId,
   });
-  console.log(contact);
+  console.log('Fetched Contact:', contact);
   return contact;
 };
+
 export const getCreateContact = async (payload) => {
   const { phoneNumber, email, userId } = payload;
 
@@ -54,6 +55,7 @@ export const getCreateContact = async (payload) => {
   const contact = await ContactCollection.create(payload);
   return contact;
 };
+
 export const updateContact = async (filter, data, options = {}) => {
   const rawResult = await ContactCollection.findOneAndUpdate(filter, data, {
     new: true,
@@ -69,4 +71,7 @@ export const updateContact = async (filter, data, options = {}) => {
   };
 };
 
-export const getDeleteContact = (id) => ContactCollection.findOneAndDelete(id);
+export const getDeleteContact = async (filter) => {
+  const contact = await ContactCollection.findOneAndDelete(filter);
+  return contact;
+};

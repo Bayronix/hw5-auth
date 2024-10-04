@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { Schema, model } from 'mongoose';
 
 const contactSchema = new Schema(
@@ -29,9 +30,9 @@ const contactSchema = new Schema(
       required: true,
     },
     userId: {
-      type: Schema.Types.ObjectId,
-      required: true,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
+      required: true,
     },
     // createdAt: {
     //   type: String,

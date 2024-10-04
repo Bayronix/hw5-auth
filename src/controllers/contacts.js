@@ -11,13 +11,13 @@ export const getAllContactsController = async (req, res, next) => {
     const { sortBy, sortOrder } = parseSortParams({ ...req.query, sortFields });
     const filter = parseContactsFilterParams(req.query);
     const { _id: userId } = req.user;
-    console.log(userId);
+
     const data = await contactServices.getAllContacts({
       perPage,
       page,
       sortBy,
       sortOrder,
-      filter: { ...filter, userId: req.user._id },
+      filter: { ...filter, userId },
     });
 
     res.json({
@@ -33,13 +33,11 @@ export const getAllContactsController = async (req, res, next) => {
 export const getContactByIdController = async (req, res, next) => {
   try {
     const { contactId } = req.params;
+
     const { _id: userId } = req.user;
 
-    console.log('Contact ID:', contactId);
-    console.log('User ID:', userId);
-
     const data = await contactServices.getContactById(contactId, userId);
-    console.log(data);
+
     if (!data) {
       throw createHttpError(404, 'Contact not found');
     }
@@ -50,26 +48,29 @@ export const getContactByIdController = async (req, res, next) => {
       data,
     });
   } catch (error) {
-    console.error('Error fetching contact:', error);
     next(error);
   }
 };
 
 export const getCreateContactController = async (req, res, next) => {
   try {
+    const { _id: userId } = req.user; // Отримання ID користувача з автентифікації
+    console.log('Creating contact for User ID:', userId); // Логування userId
+
     const payload = {
       ...req.body,
-      userId: req.user._id,
+      userId, // Використання userId для створення контакту
     };
 
     const contact = await contactServices.getCreateContact(payload);
 
     res.status(201).json({
       status: 201,
-      message: `Successfully created a contact!`,
+      message: 'Successfully created a contact!',
       data: contact,
     });
   } catch (error) {
+    console.error('Error creating contact:', error);
     next(error);
   }
 };
@@ -77,10 +78,8 @@ export const getCreateContactController = async (req, res, next) => {
 export const patchContactController = async (req, res, next) => {
   try {
     const { contactId } = req.params;
-    const { _id: userId } = req.user;
-
     const result = await contactServices.updateContact(
-      { _id: contactId, userId },
+      { _id: contactId, userId: req.user._id },
       req.body,
     );
 
@@ -102,16 +101,15 @@ export const getDeleteContactController = async (req, res, next) => {
   try {
     const { contactId } = req.params;
     const { _id: userId } = req.user;
-
     const contact = await contactServices.getDeleteContact({
       _id: contactId,
       userId,
     });
 
     if (!contact) {
-      return next(createHttpError(404, 'Contact not found'));
+      next(createHttpError(404, 'Contact not found'));
+      return;
     }
-
     res.status(204).end();
   } catch (error) {
     next(error);
@@ -121,12 +119,11 @@ export const getDeleteContactController = async (req, res, next) => {
 export const getContactsController = async (req, res, next) => {
   try {
     const { perPage, page } = parsePaginationParams(req.query);
-    const { _id: userId } = req.user;
 
     const data = await contactServices.getAllContacts({
       perPage,
       page,
-      filter: { userId },
+      userId: req.user._id,
     });
 
     res.json({
